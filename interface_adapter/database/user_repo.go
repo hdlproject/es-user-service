@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"github.com/hdlproject/es-user-service/entity"
 	"github.com/hdlproject/es-user-service/helper"
 	"github.com/hdlproject/es-user-service/use_case/output_port"
@@ -43,15 +44,18 @@ func (instance *userRepo) Register(userData entity.User) (uint, error) {
 func (instance *userRepo) IncreaseBalance(id uint, increment uint64) error {
 	user := User{ID: id}
 	err := instance.client.db.Transaction(func(tx *gorm.DB) error {
-		err := tx.Find(&user).Error
+		err := tx.First(&user).Error
 		if err != nil {
 			return helper.WrapError(err)
 		}
 
-		err = tx.Model(&user).Update("Balance", user.Balance+increment).Error
+		user.Balance = user.Balance + increment
+		err = tx.Save(&user).Error
 		if err != nil {
 			return helper.WrapError(err)
 		}
+
+		fmt.Println(user.Balance, increment)
 
 		return nil
 	})
