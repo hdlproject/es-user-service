@@ -37,7 +37,7 @@ func init() {
 func main() {
 	configInstance, _ := config.GetInstance()
 
-	messaging.Subscribe(configInstance.EventBus)
+	messaging.Subscribe()
 
 	httpServer := api.GetHTTPServer(configInstance.Port)
 	api.RegisterUserAPI()

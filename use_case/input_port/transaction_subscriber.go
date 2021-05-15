@@ -3,7 +3,8 @@ package input_port
 import "github.com/streadway/amqp"
 
 type (
-	TransactionSubscriber interface {
+	TopUpSubscriber interface {
 		Subscribe() (<-chan amqp.Delivery, error)
+		HandleMessage(message string) error
 	}
 )
