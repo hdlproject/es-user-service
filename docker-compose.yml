@@ -7,9 +7,9 @@ services:
     volumes:
       - postgresql-data:/var/lib/postgresql/data/pgdata
     ports:
-      - 5435:5432
+      - 5432:5432
     networks:
-      - user-service
+      - postgresql
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -21,3 +21,7 @@ services:
 volumes:
   postgresql-data:
     driver: local
+
+networks:
+  postgresql:
+    driver: bridge
