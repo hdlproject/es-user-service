@@ -9,9 +9,10 @@ import (
 
 type (
 	Config struct {
-		Port     string
-		Database Database
-		EventBus EventBus
+		Port         string
+		Database     Database
+		EventBus     EventBus
+		EventStorage EventStorage
 	}
 
 	Database struct {
@@ -27,6 +28,14 @@ type (
 		Port     string
 		Username string
 		Password string
+	}
+
+	EventStorage struct {
+		Host     string
+		Port     string
+		Username string
+		Password string
+		Name     string
 	}
 )
 
@@ -83,6 +92,11 @@ func getConfig() (Config, error) {
 		return Config{}, helper.WrapError(err)
 	}
 
+	eventStoragePassword, err := getMandatoryString("EVENT_STORAGE_PASSWORD")
+	if err != nil {
+		return Config{}, helper.WrapError(err)
+	}
+
 	return Config{
 		Port: viper.GetString("PORT"),
 		Database: Database{
@@ -97,6 +111,13 @@ func getConfig() (Config, error) {
 			Port:     viper.GetString("EVENT_BUS_PORT"),
 			Username: viper.GetString("EVENT_BUS_USERNAME"),
 			Password: eventBusPassword,
+		},
+		EventStorage: EventStorage{
+			Host:     viper.GetString("EVENT_STORAGE_HOST"),
+			Port:     viper.GetString("EVENT_STORAGE_PORT"),
+			Username: viper.GetString("EVENT_STORAGE_USERNAME"),
+			Password: eventStoragePassword,
+			Name:     viper.GetString("EVENT_STORAGE_NAME"),
 		},
 	}, nil
 }

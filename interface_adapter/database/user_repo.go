@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"github.com/hdlproject/es-user-service/entity"
 	"github.com/hdlproject/es-user-service/helper"
 	"github.com/hdlproject/es-user-service/use_case/output_port"
@@ -54,8 +53,6 @@ func (instance *userRepo) IncreaseBalance(id uint, increment uint64) error {
 		if err != nil {
 			return helper.WrapError(err)
 		}
-
-		fmt.Println(user.Balance, increment)
 
 		return nil
 	})

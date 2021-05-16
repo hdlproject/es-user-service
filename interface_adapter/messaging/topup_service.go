@@ -54,8 +54,9 @@ func (topUpRequest) parse(requestBody string) (request topUpRequest, err error) 
 
 func (instance topUpRequest) getUseCase() interactor.TopUpRequest {
 	return interactor.TopUpRequest{
-		UserID:    instance.Params.UserID,
-		Increment: instance.Params.Amount,
+		TransactionEventID: instance.ID,
+		UserID:             instance.Params.UserID,
+		Increment:          instance.Params.Amount,
 	}
 }
 

@@ -32,6 +32,11 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
+	_, err = database.GetMongoDB(configInstance.EventStorage)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {

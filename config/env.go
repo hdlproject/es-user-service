@@ -25,6 +25,12 @@ func newEnvConfig(configurable Configurable) (Configurable, error) {
 		"EVENT_BUS_PORT",
 		"EVENT_BUS_USERNAME",
 		"EVENT_BUS_PASSWORD",
+
+		"EVENT_STORAGE_HOST",
+		"EVENT_STORAGE_PORT",
+		"EVENT_STORAGE_USERNAME",
+		"EVENT_STORAGE_PASSWORD",
+		"EVENT_STORAGE_NAME",
 	}
 
 	var err error

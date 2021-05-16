@@ -16,10 +16,13 @@ func Subscribe() {
 
 		postgresClient, _ := database.GetPostgresClient(configInstance.Database)
 
+		mongoClient, _ := database.GetMongoDB(configInstance.EventStorage)
+
 		transactionSubscriber, err := NewTopUpSubscriber(
 			eventSubscriber,
 			interactor.NewTopUpUseCase(
-				database.NewUserRepo(postgresClient)),
+				database.NewUserRepo(postgresClient),
+				database.NewTransactionEventRepo(mongoClient)),
 		)
 		if err != nil {
 			panic(err)
@@ -35,7 +38,6 @@ func Subscribe() {
 			err = transactionSubscriber.HandleMessage(string(message.Body))
 			if err != nil {
 				log.Println(err)
-				return
 			}
 		}
 	}()
