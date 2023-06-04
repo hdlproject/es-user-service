@@ -2,8 +2,10 @@ package config
 
 import (
 	"errors"
-	"github.com/hdlproject/es-user-service/helper"
+
 	"github.com/spf13/viper"
+
+	"github.com/hdlproject/es-user-service/helper"
 )
 
 type (
