@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/hdlproject/es-user-service/config"
-	"github.com/hdlproject/es-user-service/helper"
 	"github.com/hdlproject/es-user-service/interface_adapter/api"
 	"github.com/hdlproject/es-user-service/interface_adapter/database"
 	"github.com/hdlproject/es-user-service/interface_adapter/messaging"
+	"github.com/hdlproject/es-user-service/interface_adapter/security"
 )
 
 func init() {
@@ -39,12 +39,12 @@ func init() {
 		panic(err)
 	}
 
-	kmsClient, err := helper.NewKMSClient(configInstance.AWS.ID, configInstance.AWS.Secret)
+	kmsClient, err := security.NewKMSClient(configInstance.AWS.ID, configInstance.AWS.Secret)
 	if err != nil {
 		panic(err)
 	}
 
-	_ = helper.NewJWT(kmsClient)
+	_ = security.NewJWT(kmsClient)
 }
 
 func main() {

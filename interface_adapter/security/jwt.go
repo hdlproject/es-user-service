@@ -1,9 +1,11 @@
-package helper
+package security
 
 import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt"
+
+	"github.com/hdlproject/es-user-service/helper"
 )
 
 type JWT struct {
@@ -38,7 +40,7 @@ func (instance *JWT) Sign(claims JWTCustomClaims, method jwt.SigningMethod) (str
 
 	ss, err := token.SignedString(nil)
 	if err != nil {
-		return "", WrapError(err)
+		return "", helper.WrapError(err)
 	}
 
 	return ss, nil
@@ -49,7 +51,7 @@ func (instance *JWT) Verify(tokenString string) (JWTCustomClaims, error) {
 		return nil, nil
 	})
 	if err != nil {
-		return JWTCustomClaims{}, WrapError(err)
+		return JWTCustomClaims{}, helper.WrapError(err)
 	}
 
 	var claims *JWTCustomClaims

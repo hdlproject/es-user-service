@@ -1,4 +1,4 @@
-package helper
+package security
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
@@ -6,6 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
+
+	"github.com/hdlproject/es-user-service/helper"
 )
 
 type KMSClient struct {
@@ -20,7 +22,7 @@ func NewKMSClient(id, secret string) (*KMSClient, error) {
 		},
 	)
 	if err != nil {
-		return nil, WrapError(err)
+		return nil, helper.WrapError(err)
 	}
 
 	return &KMSClient{
@@ -37,7 +39,7 @@ func (instance *KMSClient) GenerateMac(message string) (string, error) {
 
 	result, err := instance.svc.GenerateMac(input)
 	if err != nil {
-		return "", WrapError(err)
+		return "", helper.WrapError(err)
 	}
 
 	return string(result.Mac), nil
@@ -53,7 +55,7 @@ func (instance *KMSClient) VerifyMac(signature, message string) error {
 
 	_, err := instance.svc.VerifyMac(input)
 	if err != nil {
-		return WrapError(err)
+		return helper.WrapError(err)
 	}
 
 	return nil
@@ -69,7 +71,7 @@ func (instance *KMSClient) Sign(message string) (string, error) {
 
 	result, err := instance.svc.Sign(input)
 	if err != nil {
-		return "", WrapError(err)
+		return "", helper.WrapError(err)
 	}
 
 	return string(result.Signature), nil
@@ -86,7 +88,7 @@ func (instance *KMSClient) Verify(signature, message string) error {
 
 	_, err := instance.svc.Verify(input)
 	if err != nil {
-		return WrapError(err)
+		return helper.WrapError(err)
 	}
 
 	return nil

@@ -1,7 +1,9 @@
-package helper
+package security
 
 import (
 	"github.com/golang-jwt/jwt"
+
+	"github.com/hdlproject/es-user-service/helper"
 )
 
 type SigningMethodRSA struct {
@@ -29,7 +31,7 @@ func (m *SigningMethodRSA) Verify(signingString, signature string, key interface
 
 	err = m.KMSClient.Verify(string(sig), signingString)
 	if err != nil {
-		return WrapError(err)
+		return helper.WrapError(err)
 	}
 
 	return nil
@@ -42,7 +44,7 @@ func (m *SigningMethodRSA) Sign(signingString string, key interface{}) (string, 
 
 	hashStr, err := m.KMSClient.Sign(signingString)
 	if err != nil {
-		return "", WrapError(err)
+		return "", helper.WrapError(err)
 	}
 
 	return jwt.EncodeSegment([]byte(hashStr)), nil

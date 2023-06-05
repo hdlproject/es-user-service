@@ -1,7 +1,9 @@
-package helper
+package security
 
 import (
 	"github.com/golang-jwt/jwt"
+
+	"github.com/hdlproject/es-user-service/helper"
 )
 
 type SigningMethodHMAC struct {
@@ -29,7 +31,7 @@ func (m *SigningMethodHMAC) Verify(signingString, signature string, key interfac
 
 	err = m.KMSClient.VerifyMac(string(sig), signingString)
 	if err != nil {
-		return WrapError(err)
+		return helper.WrapError(err)
 	}
 
 	return nil
@@ -42,7 +44,7 @@ func (m *SigningMethodHMAC) Sign(signingString string, key interface{}) (string,
 
 	hashStr, err := m.KMSClient.GenerateMac(signingString)
 	if err != nil {
-		return "", WrapError(err)
+		return "", helper.WrapError(err)
 	}
 
 	return jwt.EncodeSegment([]byte(hashStr)), nil
