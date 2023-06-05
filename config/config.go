@@ -15,6 +15,7 @@ type (
 		Database     Database
 		EventBus     EventBus
 		EventStorage EventStorage
+		AWS          AWS
 	}
 
 	Database struct {
@@ -38,6 +39,11 @@ type (
 		Username string
 		Password string
 		Name     string
+	}
+
+	AWS struct {
+		ID     string
+		Secret string
 	}
 )
 
@@ -120,6 +126,10 @@ func getConfig() (Config, error) {
 			Username: viper.GetString("EVENT_STORAGE_USERNAME"),
 			Password: eventStoragePassword,
 			Name:     viper.GetString("EVENT_STORAGE_NAME"),
+		},
+		AWS: AWS{
+			ID:     viper.GetString("AWS_ID"),
+			Secret: viper.GetString("AWS_SECRET"),
 		},
 	}, nil
 }
