@@ -11,7 +11,7 @@ import (
 )
 
 func TestJWT_Sign(t *testing.T) {
-	kmsClient, err := NewKMSClient("AKIAWZQRAROIO2J2V7VE", "CGPbr6mcUcIKskdnAo6uv1CuyXtH+iX6f5bapwCb")
+	kmsClient, err := NewKMSClient("asd", "asd")
 	if err != nil {
 		t.Fatal(err)
 	}
