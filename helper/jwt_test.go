@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -17,6 +18,20 @@ func TestJWT_Sign(t *testing.T) {
 
 	jwtGenerator := NewJWT(kmsClient)
 
+	tests := []struct {
+		name          string
+		signingMethod jwt.SigningMethod
+	}{
+		{
+			name:          "symmetric",
+			signingMethod: SigningMethodHS512KMS,
+		},
+		{
+			name:          "asymmetric",
+			signingMethod: SigningMethodRS512KMS,
+		},
+	}
+
 	expectedClaims := JWTCustomClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
@@ -28,17 +43,24 @@ func TestJWT_Sign(t *testing.T) {
 			Audience:  "es-services",
 		},
 	}
-	signedString, err := jwtGenerator.Sign(expectedClaims)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	claims, err := jwtGenerator.Verify(signedString)
-	if err != nil {
-		t.Fatal(err)
-	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			signedString, err := jwtGenerator.Sign(expectedClaims, test.signingMethod)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	if diff := cmp.Diff(expectedClaims, claims); diff != "" {
-		t.Fatalf("(-want/+got)\n%s", diff)
+			fmt.Println(signedString)
+
+			claims, err := jwtGenerator.Verify(signedString)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if diff := cmp.Diff(expectedClaims, claims); diff != "" {
+				t.Fatalf("(-want/+got)\n%s", diff)
+			}
+		})
 	}
 }

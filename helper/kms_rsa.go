@@ -4,20 +4,20 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-type SigningMethodHMAC struct {
+type SigningMethodRSA struct {
 	Name      string
 	KMSClient *KMSClient
 }
 
 var (
-	SigningMethodHS512KMS *SigningMethodHMAC
+	SigningMethodRS512KMS *SigningMethodRSA
 )
 
-func (m *SigningMethodHMAC) Alg() string {
+func (m *SigningMethodRSA) Alg() string {
 	return m.Name
 }
 
-func (m *SigningMethodHMAC) Verify(signingString, signature string, key interface{}) error {
+func (m *SigningMethodRSA) Verify(signingString, signature string, key interface{}) error {
 	sig, err := jwt.DecodeSegment(signature)
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func (m *SigningMethodHMAC) Verify(signingString, signature string, key interfac
 		return jwt.ErrHashUnavailable
 	}
 
-	err = m.KMSClient.VerifyMac(string(sig), signingString)
+	err = m.KMSClient.Verify(string(sig), signingString)
 	if err != nil {
 		return WrapError(err)
 	}
@@ -35,12 +35,12 @@ func (m *SigningMethodHMAC) Verify(signingString, signature string, key interfac
 	return nil
 }
 
-func (m *SigningMethodHMAC) Sign(signingString string, key interface{}) (string, error) {
+func (m *SigningMethodRSA) Sign(signingString string, key interface{}) (string, error) {
 	if m.KMSClient == nil {
 		return "", jwt.ErrHashUnavailable
 	}
 
-	hashStr, err := m.KMSClient.GenerateMac(signingString)
+	hashStr, err := m.KMSClient.Sign(signingString)
 	if err != nil {
 		return "", WrapError(err)
 	}

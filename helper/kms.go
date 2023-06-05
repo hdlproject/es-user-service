@@ -28,7 +28,7 @@ func NewKMSClient(id, secret string) (*KMSClient, error) {
 	}, nil
 }
 
-func (instance *KMSClient) GenerateMacInput(message string) (string, error) {
+func (instance *KMSClient) GenerateMac(message string) (string, error) {
 	input := &kms.GenerateMacInput{
 		KeyId:        aws.String("c4fed70d-6cc4-4a8a-a0d5-84eb865e1490"),
 		MacAlgorithm: aws.String("HMAC_SHA_512"),
@@ -52,6 +52,39 @@ func (instance *KMSClient) VerifyMac(signature, message string) error {
 	}
 
 	_, err := instance.svc.VerifyMac(input)
+	if err != nil {
+		return WrapError(err)
+	}
+
+	return nil
+}
+
+func (instance *KMSClient) Sign(message string) (string, error) {
+	input := &kms.SignInput{
+		KeyId:            aws.String("c720978c-a2ab-42c8-baa0-478b5462b49e"),
+		SigningAlgorithm: aws.String("RSASSA_PKCS1_V1_5_SHA_512"),
+		Message:          []byte(message),
+		MessageType:      aws.String("RAW"),
+	}
+
+	result, err := instance.svc.Sign(input)
+	if err != nil {
+		return "", WrapError(err)
+	}
+
+	return string(result.Signature), nil
+}
+
+func (instance *KMSClient) Verify(signature, message string) error {
+	input := &kms.VerifyInput{
+		KeyId:            aws.String("c720978c-a2ab-42c8-baa0-478b5462b49e"),
+		SigningAlgorithm: aws.String("RSASSA_PKCS1_V1_5_SHA_512"),
+		Signature:        []byte(signature),
+		Message:          []byte(message),
+		MessageType:      aws.String("RAW"),
+	}
+
+	_, err := instance.svc.Verify(input)
 	if err != nil {
 		return WrapError(err)
 	}

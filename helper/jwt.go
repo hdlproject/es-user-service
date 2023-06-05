@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"crypto"
 	"fmt"
 
 	"github.com/golang-jwt/jwt"
@@ -17,18 +16,25 @@ type JWTCustomClaims struct {
 func NewJWT(kmsClient *KMSClient) *JWT {
 	SigningMethodHS512KMS = &SigningMethodHMAC{
 		Name:      "HS512-KMS",
-		Hash:      crypto.SHA512,
 		KMSClient: kmsClient,
 	}
 	jwt.RegisterSigningMethod(SigningMethodHS512KMS.Alg(), func() jwt.SigningMethod {
 		return SigningMethodHS512KMS
 	})
 
+	SigningMethodRS512KMS = &SigningMethodRSA{
+		Name:      "RS512-KMS",
+		KMSClient: kmsClient,
+	}
+	jwt.RegisterSigningMethod(SigningMethodRS512KMS.Alg(), func() jwt.SigningMethod {
+		return SigningMethodRS512KMS
+	})
+
 	return &JWT{}
 }
 
-func (instance *JWT) Sign(claims JWTCustomClaims) (string, error) {
-	token := jwt.NewWithClaims(SigningMethodHS512KMS, claims)
+func (instance *JWT) Sign(claims JWTCustomClaims, method jwt.SigningMethod) (string, error) {
+	token := jwt.NewWithClaims(method, claims)
 
 	ss, err := token.SignedString(nil)
 	if err != nil {
