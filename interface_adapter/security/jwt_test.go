@@ -11,7 +11,7 @@ import (
 )
 
 func TestJWT_Sign(t *testing.T) {
-	kmsClient, err := NewKMSClient("asd", "asd")
+	kmsClient, err := NewKMSClient("AKIAWZQRAROIO2J2V7VE", "CGPbr6mcUcIKskdnAo6uv1CuyXtH+iX6f5bapwCb")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,6 +29,10 @@ func TestJWT_Sign(t *testing.T) {
 		{
 			name:          "asymmetric",
 			signingMethod: SigningMethodRS512KMS,
+		},
+		{
+			name:          "asymmetric with offline verification",
+			signingMethod: SigningMethodRS512KMSOffline,
 		},
 	}
 

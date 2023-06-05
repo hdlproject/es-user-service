@@ -1,7 +1,11 @@
 package security
 
 import (
+	"crypto"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
+	"os"
 
 	"github.com/golang-jwt/jwt"
 
@@ -25,11 +29,33 @@ func NewJWT(kmsClient *KMSClient) *JWT {
 	})
 
 	SigningMethodRS512KMS = &SigningMethodRSA{
-		Name:      "RS512-KMS",
-		KMSClient: kmsClient,
+		Name:                  "RS512-KMS",
+		KMSClient:             kmsClient,
+		UseOnlineVerification: true,
 	}
 	jwt.RegisterSigningMethod(SigningMethodRS512KMS.Alg(), func() jwt.SigningMethod {
 		return SigningMethodRS512KMS
+	})
+
+	publicKeyStr, err := os.ReadFile("../../kms-public-key.pem")
+	if err != nil {
+		panic(err)
+	}
+	block, _ := pem.Decode(publicKeyStr)
+	b := block.Bytes
+	key, err := x509.ParsePKIXPublicKey(b)
+	if err != nil {
+		panic(err)
+	}
+
+	SigningMethodRS512KMSOffline = &SigningMethodRSA{
+		Name:      "RS512-KMS-Offline",
+		KMSClient: kmsClient,
+		Hash:      crypto.SHA512,
+		Key:       key,
+	}
+	jwt.RegisterSigningMethod(SigningMethodRS512KMSOffline.Alg(), func() jwt.SigningMethod {
+		return SigningMethodRS512KMSOffline
 	})
 
 	return &JWT{}
