@@ -31,6 +31,9 @@ func TestCentrifugeClient_Publish(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// let the subscription created on Centrifugo server
+	time.Sleep(1 * time.Second)
+
 	err = client.Publish(ctx, channel, message)
 	if err != nil {
 		t.Fatal(err)

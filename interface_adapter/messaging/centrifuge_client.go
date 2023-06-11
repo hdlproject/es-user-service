@@ -75,14 +75,19 @@ func (instance *CentrifugeClient) Subscribe(channel string, receiverFunc func(m 
 }
 
 func (instance *CentrifugeClient) Publish(ctx context.Context, channel string, m string) (err error) {
-	if instance.subscriptions[channel] == nil {
-		instance.subscriptions[channel], err = instance.client.NewSubscription(channel)
-		if err != nil {
-			return helper.WrapError(err)
-		}
-	}
+	//if instance.subscriptions[channel] == nil {
+	//	instance.subscriptions[channel], err = instance.client.NewSubscription(channel)
+	//	if err != nil {
+	//		return helper.WrapError(err)
+	//	}
+	//}
+	//
+	//_, err = instance.subscriptions[channel].Publish(ctx, []byte(m))
+	//if err != nil {
+	//	return helper.WrapError(err)
+	//}
 
-	_, err = instance.subscriptions[channel].Publish(ctx, []byte(m))
+	_, err = instance.client.Publish(ctx, channel, []byte(m))
 	if err != nil {
 		return helper.WrapError(err)
 	}
