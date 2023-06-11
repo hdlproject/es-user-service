@@ -32,6 +32,8 @@ func newDefaultConfig(configurable Configurable) Configurable {
 	viper.SetDefault("EVENT_STORE_USERNAME", "root")
 	viper.SetDefault("EVENT_STORE_NAME", "es-user-service")
 
+	viper.SetDefault("CENTRIFUGE_SERVER_URL", "ws://localhost:8000/connection/websocket")
+
 	return defaultConfig{
 		configurable: configurable,
 	}

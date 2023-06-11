@@ -32,6 +32,12 @@ func newEnvConfig(configurable Configurable) (Configurable, error) {
 		"EVENT_STORAGE_USERNAME",
 		"EVENT_STORAGE_PASSWORD",
 		"EVENT_STORAGE_NAME",
+
+		"AWS_ID",
+		"AWS_SECRET",
+
+		"CENTRIFUGE_SERVER_URL",
+		"CENTRIFUGE_TOKEN",
 	}
 
 	var err error

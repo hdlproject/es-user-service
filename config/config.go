@@ -16,6 +16,7 @@ type (
 		EventBus     EventBus
 		EventStorage EventStorage
 		AWS          AWS
+		Centrifuge   Centrifuge
 	}
 
 	Database struct {
@@ -44,6 +45,11 @@ type (
 	AWS struct {
 		ID     string
 		Secret string
+	}
+
+	Centrifuge struct {
+		ServerUrl string
+		Token     string
 	}
 )
 
@@ -130,6 +136,10 @@ func getConfig() (Config, error) {
 		AWS: AWS{
 			ID:     viper.GetString("AWS_ID"),
 			Secret: viper.GetString("AWS_SECRET"),
+		},
+		Centrifuge: Centrifuge{
+			ServerUrl: viper.GetString("CENTRIFUGE_SERVER_URL"),
+			Token:     viper.GetString("CENTRIFUGE_TOKEN"),
 		},
 	}, nil
 }

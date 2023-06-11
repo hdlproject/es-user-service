@@ -45,6 +45,11 @@ func init() {
 	}
 
 	_ = security.NewJWT(kmsClient)
+
+	_, err = messaging.GetCentrifugeClient(configInstance.Centrifuge.ServerUrl, configInstance.Centrifuge.Token, "")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
