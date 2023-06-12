@@ -47,7 +47,7 @@ services:
     image: centrifugo/centrifugo:v4
     volumes:
       - ./centrifugo-config.json:/centrifugo/config.json
-    command: centrifugo -c config.json --client_insecure
+    command: centrifugo -c config.json
     ports:
       - 8000:8000
     ulimits:

@@ -4,5 +4,7 @@
   "admin_password": "password",
   "admin_secret": "secret",
   "admin": true,
-  "allow_subscribe_for_client": true
+  "allow_subscribe_for_client": true,
+  "allow_publish_for_client": true,
+  "allow_publish_for_subscriber": true
 }

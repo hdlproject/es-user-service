@@ -4,29 +4,35 @@ import (
 	"context"
 	"testing"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
 func TestCentrifugeClient_Publish(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	channel := "test_channel"
+	message := `{"message": "test"}`
+	userId := "test_user"
+	secret := "token_secret"
+
+	clientToken := generateClientJWT(t, userId, secret)
 	client, err := GetCentrifugeClient(
 		"ws://localhost:8000/connection/websocket",
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0IiwiZXhwIjoxNjg2OTczNTgwLCJpYXQiOjE2ODYzNjg3ODB9.B4rHk9pkS5Wqu4Qg2RMNkfG9dg9U0h-LlE72Pa2beDM",
+		clientToken,
 		"")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	channel := "test_channel"
-	message := `{"message": "test"}`
 
 	c := make(chan string, 1)
 	receiverFunc := func(m string) {
 		c <- m
 	}
 
-	err = client.Subscribe(channel, receiverFunc)
+	subsToken := generateSubscriptionJWT(t, userId, channel, secret)
+	err = client.Subscribe(channel, subsToken, receiverFunc)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,4 +53,38 @@ func TestCentrifugeClient_Publish(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatalf("test timeout")
 	}
+}
+
+func generateClientJWT(t *testing.T, userId, secret string) string {
+	claims := CentrifugeJWTClaims{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   userId,
+			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
+		},
+	}
+
+	return generateJWT(t, claims, secret)
+}
+
+func generateSubscriptionJWT(t *testing.T, userId, channel, secret string) string {
+	claims := CentrifugeJWTClaims{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   userId,
+			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
+		},
+		Channel: channel,
+	}
+
+	return generateJWT(t, claims, secret)
+}
+
+func generateJWT(t *testing.T, claims jwt.Claims, secret string) string {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	signedToken, err := token.SignedString([]byte(secret))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return signedToken
 }
