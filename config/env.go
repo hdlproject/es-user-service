@@ -38,6 +38,10 @@ func newEnvConfig(configurable Configurable) (Configurable, error) {
 
 		"CENTRIFUGE_SERVER_URL",
 		"CENTRIFUGE_TOKEN",
+
+		"REDIS_HOST",
+		"REDIS_PORT",
+		"REDIS_PASSWORD",
 	}
 
 	var err error

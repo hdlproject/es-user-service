@@ -18,6 +18,15 @@ services:
     env_file:
       - .env
 
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass admin
+    volumes:
+      - redis:/data
+
 #  mongo:
 #    image: mongo:4.4-bionic
 #    restart: always
@@ -57,6 +66,8 @@ services:
 
 volumes:
   postgresql-data:
+    driver: local
+  redis:
     driver: local
   mongo-data:
     driver: local

@@ -17,6 +17,7 @@ type (
 		EventStorage EventStorage
 		AWS          AWS
 		Centrifuge   Centrifuge
+		Redis        Redis
 	}
 
 	Database struct {
@@ -50,6 +51,12 @@ type (
 	Centrifuge struct {
 		ServerUrl string
 		Token     string
+	}
+
+	Redis struct {
+		Host     string
+		Port     string
+		Password string
 	}
 )
 
@@ -111,6 +118,11 @@ func getConfig() (Config, error) {
 		return Config{}, helper.WrapError(err)
 	}
 
+	redisPassword, err := getMandatoryString("REDIS_PASSWORD")
+	if err != nil {
+		return Config{}, helper.WrapError(err)
+	}
+
 	return Config{
 		Port: viper.GetString("PORT"),
 		Database: Database{
@@ -140,6 +152,11 @@ func getConfig() (Config, error) {
 		Centrifuge: Centrifuge{
 			ServerUrl: viper.GetString("CENTRIFUGE_SERVER_URL"),
 			Token:     viper.GetString("CENTRIFUGE_TOKEN"),
+		},
+		Redis: Redis{
+			Host:     viper.GetString("REDIS_HOST"),
+			Port:     viper.GetString("REDIS_PORT"),
+			Password: redisPassword,
 		},
 	}, nil
 }

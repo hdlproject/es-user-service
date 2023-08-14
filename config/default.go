@@ -34,6 +34,9 @@ func newDefaultConfig(configurable Configurable) Configurable {
 
 	viper.SetDefault("CENTRIFUGE_SERVER_URL", "ws://localhost:8000/connection/websocket")
 
+	viper.SetDefault("REDIS_HOST", "127.0.0.1")
+	viper.SetDefault("REDIS_PORT", "6379")
+
 	return defaultConfig{
 		configurable: configurable,
 	}
