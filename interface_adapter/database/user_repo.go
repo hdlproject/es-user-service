@@ -1,11 +1,15 @@
 package database
 
 import (
+	"context"
+	"strconv"
+	"time"
+
+	"gorm.io/gorm"
+
 	"github.com/hdlproject/es-user-service/entity"
 	"github.com/hdlproject/es-user-service/helper"
 	"github.com/hdlproject/es-user-service/use_case/output_port"
-	"gorm.io/gorm"
-	"time"
 )
 
 type (
@@ -20,13 +24,17 @@ type (
 
 type (
 	userRepo struct {
-		client *PostgresClient
+		client      *PostgresClient
+		redisClient *RedisClient
 	}
 )
 
-func NewUserRepo(client *PostgresClient) output_port.UserRepo {
+var userLocationRedisKey = "user:location"
+
+func NewUserRepo(client *PostgresClient, redisClient *RedisClient) output_port.UserRepo {
 	return &userRepo{
-		client: client,
+		client:      client,
+		redisClient: redisClient,
 	}
 }
 
@@ -61,6 +69,33 @@ func (instance *userRepo) IncreaseBalance(id uint, increment uint64) error {
 	}
 
 	return nil
+}
+
+func (instance *userRepo) Track(ctx context.Context, location entity.UserLocation) error {
+	err := instance.redisClient.GeoAdd(ctx, userLocationRedisKey, strconv.FormatUint(uint64(location.UserID), 10), location.Lon, location.Lat)
+	if err != nil {
+		return helper.WrapError(err)
+	}
+
+	return nil
+}
+
+func (instance *userRepo) LocateNearbyUser(ctx context.Context, location entity.UserLocation) ([]uint, error) {
+	userIDs, err := instance.redisClient.GeoSearchByRadius(ctx, userLocationRedisKey, strconv.FormatUint(uint64(location.UserID), 10), 5)
+	if err != nil {
+		return nil, helper.WrapError(err)
+	}
+
+	var userIDsInt []uint
+	for _, userID := range userIDs {
+		userIDInt, err := strconv.ParseUint(userID, 10, 64)
+		if err != nil {
+			return nil, helper.WrapError(err)
+		}
+		userIDsInt = append(userIDsInt, uint(userIDInt))
+	}
+
+	return userIDsInt, nil
 }
 
 func (User) fromEntity(user entity.User) User {

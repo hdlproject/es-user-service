@@ -57,10 +57,9 @@ func (instance *RedisClient) GeoAdd(ctx context.Context, key, name string, lon, 
 	return nil
 }
 
-func (instance *RedisClient) GeoSearchByRadius(ctx context.Context, key string, lon, lat, radius float64) ([]string, error) {
+func (instance *RedisClient) GeoSearchByRadius(ctx context.Context, key, name string, radius float64) ([]string, error) {
 	res, err := instance.Client.GeoSearch(ctx, key, &redis.GeoSearchQuery{
-		Longitude:  lon,
-		Latitude:   lat,
+		Member:     name,
 		Radius:     radius,
 		RadiusUnit: "km",
 		Sort:       "asc",

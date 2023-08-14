@@ -14,6 +14,7 @@ require (
 	github.com/streadway/amqp v1.0.0
 	go.mongodb.org/mongo-driver v1.11.6
 	golang.org/x/crypto v0.9.0
+	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
 )

@@ -45,6 +45,11 @@ func TestRedisClient_GeoSearchByRadius(t *testing.T) {
 			lon:  -110,
 			lat:  30,
 		},
+		{
+			name: "loc E",
+			lon:  -122.2612767,
+			lat:  37.7936847,
+		},
 	}
 	for _, item := range seederData {
 		err := redisClient.GeoAdd(ctx, key, item.name, item.lon, item.lat)
@@ -53,12 +58,12 @@ func TestRedisClient_GeoSearchByRadius(t *testing.T) {
 		}
 	}
 
-	res, err := redisClient.GeoSearchByRadius(ctx, key, -122.2612767, 37.7936847, 5)
+	res, err := redisClient.GeoSearchByRadius(ctx, key, "loc E", 5)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expectedRes := []string{"loc B", "loc A", "loc C"}
+	expectedRes := []string{"loc E", "loc B", "loc A", "loc C"}
 	if diff := cmp.Diff(expectedRes, res); diff != "" {
 		t.Fatalf("(-want/+got)\n%s", diff)
 	}
