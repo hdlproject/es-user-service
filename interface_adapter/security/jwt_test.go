@@ -1,7 +1,6 @@
 package security
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -54,8 +53,6 @@ func TestJWT_Sign(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			fmt.Println(signedString)
 
 			claims, err := jwtGenerator.Verify(signedString)
 			if err != nil {
