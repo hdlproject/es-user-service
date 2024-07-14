@@ -26,7 +26,5 @@ func (instance *PasswordManager) GetHashedPassword(password string) string {
 }
 
 func (instance *PasswordManager) IsPasswordValid(password, hashedPassword string) bool {
-	hash := instance.GetHashedPassword(password)
-
-	return hash == hashedPassword
+	return instance.GetHashedPassword(password) == hashedPassword
 }

@@ -20,21 +20,21 @@ type JWTCustomClaims struct {
 }
 
 func NewJWT(kmsClient *KMSClient) *JWT {
-	SigningMethodHS512KMS = &SigningMethodHMAC{
-		Name:      "HS512-KMS",
-		KMSClient: kmsClient,
+	signingMethodHS512KMS = &signingMethodHMAC{
+		name:      "HS512-KMS",
+		kmsClient: kmsClient,
 	}
-	jwt.RegisterSigningMethod(SigningMethodHS512KMS.Alg(), func() jwt.SigningMethod {
-		return SigningMethodHS512KMS
+	jwt.RegisterSigningMethod(signingMethodHS512KMS.Alg(), func() jwt.SigningMethod {
+		return signingMethodHS512KMS
 	})
 
-	SigningMethodRS512KMS = &SigningMethodRSA{
-		Name:                  "RS512-KMS",
-		KMSClient:             kmsClient,
-		UseOnlineVerification: true,
+	signingMethodRS512KMS = &signingMethodRSA{
+		name:                  "RS512-KMS",
+		kmsClient:             kmsClient,
+		useOnlineVerification: true,
 	}
-	jwt.RegisterSigningMethod(SigningMethodRS512KMS.Alg(), func() jwt.SigningMethod {
-		return SigningMethodRS512KMS
+	jwt.RegisterSigningMethod(signingMethodRS512KMS.Alg(), func() jwt.SigningMethod {
+		return signingMethodRS512KMS
 	})
 
 	publicKeyStr, err := os.ReadFile("../../kms-public-key.pem")
@@ -42,20 +42,19 @@ func NewJWT(kmsClient *KMSClient) *JWT {
 		panic(err)
 	}
 	block, _ := pem.Decode(publicKeyStr)
-	b := block.Bytes
-	key, err := x509.ParsePKIXPublicKey(b)
+	key, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		panic(err)
 	}
 
-	SigningMethodRS512KMSOffline = &SigningMethodRSA{
-		Name:      "RS512-KMS-Offline",
-		KMSClient: kmsClient,
-		Hash:      crypto.SHA512,
-		Key:       key,
+	signingMethodRS512KMSOffline = &signingMethodRSA{
+		name:      "RS512-KMS-Offline",
+		kmsClient: kmsClient,
+		hash:      crypto.SHA512,
+		key:       key,
 	}
-	jwt.RegisterSigningMethod(SigningMethodRS512KMSOffline.Alg(), func() jwt.SigningMethod {
-		return SigningMethodRS512KMSOffline
+	jwt.RegisterSigningMethod(signingMethodRS512KMSOffline.Alg(), func() jwt.SigningMethod {
+		return signingMethodRS512KMSOffline
 	})
 
 	return &JWT{}

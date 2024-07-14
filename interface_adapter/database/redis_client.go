@@ -12,7 +12,7 @@ import (
 
 type (
 	RedisClient struct {
-		Client *redis.Client
+		client *redis.Client
 	}
 )
 
@@ -38,12 +38,12 @@ func newRedisClient(host, port, password string) *RedisClient {
 	})
 
 	return &RedisClient{
-		Client: client,
+		client: client,
 	}
 }
 
 func (instance *RedisClient) GeoAdd(ctx context.Context, key, name string, lon, lat float64) error {
-	_, err := instance.Client.GeoAdd(ctx, key, []*redis.GeoLocation{
+	_, err := instance.client.GeoAdd(ctx, key, []*redis.GeoLocation{
 		{
 			Name:      name,
 			Longitude: lon,
@@ -58,7 +58,7 @@ func (instance *RedisClient) GeoAdd(ctx context.Context, key, name string, lon, 
 }
 
 func (instance *RedisClient) GeoSearchByRadius(ctx context.Context, key, name string, radius float64) ([]string, error) {
-	res, err := instance.Client.GeoSearch(ctx, key, &redis.GeoSearchQuery{
+	res, err := instance.client.GeoSearch(ctx, key, &redis.GeoSearchQuery{
 		Member:     name,
 		Radius:     radius,
 		RadiusUnit: "km",

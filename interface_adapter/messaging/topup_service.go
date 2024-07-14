@@ -2,7 +2,9 @@ package messaging
 
 import (
 	"encoding/json"
+
 	"github.com/hdlproject/es-user-service/helper"
+	"github.com/hdlproject/es-user-service/use_case/input_port"
 	"github.com/hdlproject/es-user-service/use_case/interactor"
 )
 
@@ -52,15 +54,15 @@ func (topUpRequest) parse(requestBody string) (request topUpRequest, err error) 
 	return request, nil
 }
 
-func (instance topUpRequest) getUseCase() interactor.TopUpRequest {
-	return interactor.TopUpRequest{
+func (instance topUpRequest) getUseCase() input_port.TopUpRequest {
+	return input_port.TopUpRequest{
 		TransactionEventID: instance.ID,
 		UserID:             instance.Params.UserID,
 		Increment:          instance.Params.Amount,
 	}
 }
 
-func (topUpResponse) fromUseCase(response interactor.TopUpResponse) topUpResponse {
+func (topUpResponse) fromUseCase(response input_port.TopUpResponse) topUpResponse {
 	return topUpResponse{
 		Ok:      response.Ok,
 		Message: response.Message,

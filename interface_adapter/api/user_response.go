@@ -1,6 +1,8 @@
 package api
 
-import "github.com/hdlproject/es-user-service/use_case/interactor"
+import (
+	"github.com/hdlproject/es-user-service/use_case/input_port"
+)
 
 type (
 	registerResponse struct {
@@ -10,7 +12,7 @@ type (
 	}
 )
 
-func (registerResponse) fromUseCase(request interactor.RegisterResponse) registerResponse {
+func (registerResponse) fromUseCase(request input_port.RegisterResponse) registerResponse {
 	return registerResponse{
 		Ok:      request.Ok,
 		Message: request.Message,

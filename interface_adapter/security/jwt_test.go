@@ -23,15 +23,15 @@ func TestJWT_Sign(t *testing.T) {
 	}{
 		{
 			name:          "symmetric",
-			signingMethod: SigningMethodHS512KMS,
+			signingMethod: signingMethodHS512KMS,
 		},
 		{
 			name:          "asymmetric",
-			signingMethod: SigningMethodRS512KMS,
+			signingMethod: signingMethodRS512KMS,
 		},
 		{
 			name:          "asymmetric with offline verification",
-			signingMethod: SigningMethodRS512KMSOffline,
+			signingMethod: signingMethodRS512KMSOffline,
 		},
 	}
 

@@ -9,42 +9,42 @@ import (
 	"github.com/hdlproject/es-user-service/helper"
 )
 
-type SigningMethodRSA struct {
-	Name                  string
-	KMSClient             *KMSClient
-	UseOnlineVerification bool
-	Hash                  crypto.Hash
-	Key                   interface{}
+type signingMethodRSA struct {
+	name                  string
+	kmsClient             *KMSClient
+	useOnlineVerification bool
+	hash                  crypto.Hash
+	key                   interface{}
 }
 
 var (
-	SigningMethodRS512KMS        *SigningMethodRSA
-	SigningMethodRS512KMSOffline *SigningMethodRSA
+	signingMethodRS512KMS        *signingMethodRSA
+	signingMethodRS512KMSOffline *signingMethodRSA
 )
 
-func (m *SigningMethodRSA) Alg() string {
-	return m.Name
+func (m *signingMethodRSA) Alg() string {
+	return m.name
 }
 
-func (m *SigningMethodRSA) Verify(signingString, signature string, key interface{}) error {
-	if m.UseOnlineVerification {
+func (m *signingMethodRSA) Verify(signingString, signature string, key interface{}) error {
+	if m.useOnlineVerification {
 		return m.verifyOnline(signingString, signature)
 	}
 
 	return m.verifyOffline(signingString, signature)
 }
 
-func (m *SigningMethodRSA) verifyOnline(signingString, signature string) error {
+func (m *signingMethodRSA) verifyOnline(signingString, signature string) error {
 	sig, err := jwt.DecodeSegment(signature)
 	if err != nil {
 		return err
 	}
 
-	if m.KMSClient == nil {
+	if m.kmsClient == nil {
 		return jwt.ErrHashUnavailable
 	}
 
-	err = m.KMSClient.Verify(string(sig), signingString)
+	err = m.kmsClient.Verify(string(sig), signingString)
 	if err != nil {
 		return helper.WrapError(err)
 	}
@@ -52,7 +52,7 @@ func (m *SigningMethodRSA) verifyOnline(signingString, signature string) error {
 	return nil
 }
 
-func (m *SigningMethodRSA) verifyOffline(signingString, signature string) error {
+func (m *signingMethodRSA) verifyOffline(signingString, signature string) error {
 	var err error
 
 	var sig []byte
@@ -63,25 +63,25 @@ func (m *SigningMethodRSA) verifyOffline(signingString, signature string) error 
 	var rsaKey *rsa.PublicKey
 	var ok bool
 
-	if rsaKey, ok = m.Key.(*rsa.PublicKey); !ok {
+	if rsaKey, ok = m.key.(*rsa.PublicKey); !ok {
 		return jwt.ErrInvalidKeyType
 	}
 
-	if !m.Hash.Available() {
+	if !m.hash.Available() {
 		return jwt.ErrHashUnavailable
 	}
-	hasher := m.Hash.New()
+	hasher := m.hash.New()
 	hasher.Write([]byte(signingString))
 
-	return rsa.VerifyPKCS1v15(rsaKey, m.Hash, hasher.Sum(nil), sig)
+	return rsa.VerifyPKCS1v15(rsaKey, m.hash, hasher.Sum(nil), sig)
 }
 
-func (m *SigningMethodRSA) Sign(signingString string, key interface{}) (string, error) {
-	if m.KMSClient == nil {
+func (m *signingMethodRSA) Sign(signingString string, key interface{}) (string, error) {
+	if m.kmsClient == nil {
 		return "", jwt.ErrHashUnavailable
 	}
 
-	hashStr, err := m.KMSClient.Sign(signingString)
+	hashStr, err := m.kmsClient.Sign(signingString)
 	if err != nil {
 		return "", helper.WrapError(err)
 	}

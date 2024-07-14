@@ -6,30 +6,30 @@ import (
 	"github.com/hdlproject/es-user-service/helper"
 )
 
-type SigningMethodHMAC struct {
-	Name      string
-	KMSClient *KMSClient
+type signingMethodHMAC struct {
+	name      string
+	kmsClient *KMSClient
 }
 
 var (
-	SigningMethodHS512KMS *SigningMethodHMAC
+	signingMethodHS512KMS *signingMethodHMAC
 )
 
-func (m *SigningMethodHMAC) Alg() string {
-	return m.Name
+func (m *signingMethodHMAC) Alg() string {
+	return m.name
 }
 
-func (m *SigningMethodHMAC) Verify(signingString, signature string, key interface{}) error {
+func (m *signingMethodHMAC) Verify(signingString, signature string, key interface{}) error {
 	sig, err := jwt.DecodeSegment(signature)
 	if err != nil {
 		return err
 	}
 
-	if m.KMSClient == nil {
+	if m.kmsClient == nil {
 		return jwt.ErrHashUnavailable
 	}
 
-	err = m.KMSClient.VerifyMac(string(sig), signingString)
+	err = m.kmsClient.VerifyMac(string(sig), signingString)
 	if err != nil {
 		return helper.WrapError(err)
 	}
@@ -37,12 +37,12 @@ func (m *SigningMethodHMAC) Verify(signingString, signature string, key interfac
 	return nil
 }
 
-func (m *SigningMethodHMAC) Sign(signingString string, key interface{}) (string, error) {
-	if m.KMSClient == nil {
+func (m *signingMethodHMAC) Sign(signingString string, key interface{}) (string, error) {
+	if m.kmsClient == nil {
 		return "", jwt.ErrHashUnavailable
 	}
 
-	hashStr, err := m.KMSClient.GenerateMac(signingString)
+	hashStr, err := m.kmsClient.GenerateMac(signingString)
 	if err != nil {
 		return "", helper.WrapError(err)
 	}

@@ -2,7 +2,6 @@ package messaging
 
 import (
 	"github.com/hdlproject/es-user-service/helper"
-	"github.com/hdlproject/es-user-service/use_case/input_port"
 	"github.com/hdlproject/es-user-service/use_case/interactor"
 	"github.com/streadway/amqp"
 )
@@ -18,7 +17,7 @@ type (
 )
 
 func NewTopUpSubscriber(subscriber *RabbitMQSubscriber,
-	topUpUseCase *interactor.TopUp) (input_port.TopUpSubscriber, error) {
+	topUpUseCase *interactor.TopUp) (TopUpSubscriber, error) {
 
 	exchangeName := "transactions_direct"
 	routingKey := "top_up"

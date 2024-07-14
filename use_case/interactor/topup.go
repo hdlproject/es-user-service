@@ -2,24 +2,15 @@ package interactor
 
 import (
 	"errors"
+
 	"github.com/hdlproject/es-user-service/entity"
 	"github.com/hdlproject/es-user-service/helper"
+	"github.com/hdlproject/es-user-service/use_case/input_port"
 	"github.com/hdlproject/es-user-service/use_case/output_port"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type (
-	TopUpRequest struct {
-		TransactionEventID string
-		UserID             uint
-		Increment          uint64
-	}
-
-	TopUpResponse struct {
-		Ok      bool
-		Message string
-	}
-
 	TopUp struct {
 		userRepo       output_port.UserRepo
 		topUpEventRepo output_port.TopUpEventRepo
@@ -35,7 +26,7 @@ func NewTopUpUseCase(userRepo output_port.UserRepo,
 	}
 }
 
-func (instance *TopUp) TopUp(request TopUpRequest) (response TopUpResponse, err error) {
+func (instance *TopUp) TopUp(request input_port.TopUpRequest) (response input_port.TopUpResponse, err error) {
 	topUpEvent := entity.TopUpEvent{
 		TransactionEventID: request.TransactionEventID,
 		UserID:             request.UserID,
@@ -43,25 +34,25 @@ func (instance *TopUp) TopUp(request TopUpRequest) (response TopUpResponse, err 
 	}
 	isAlreadyApplied, err := instance.topUpEventRepo.IsAlreadyApplied(topUpEvent)
 	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
-		return TopUpResponse{}, helper.WrapError(err)
+		return input_port.TopUpResponse{}, helper.WrapError(err)
 	}
 	if isAlreadyApplied {
-		return TopUpResponse{}, &helper.RequestAlreadyProcessed{
+		return input_port.TopUpResponse{}, &helper.RequestAlreadyProcessed{
 			Message: "top up request already processed",
 		}
 	}
 
 	err = instance.userRepo.IncreaseBalance(request.UserID, request.Increment)
 	if err != nil {
-		return TopUpResponse{}, helper.WrapError(err)
+		return input_port.TopUpResponse{}, helper.WrapError(err)
 	}
 
 	_, err = instance.topUpEventRepo.Insert(topUpEvent)
 	if err != nil {
-		return TopUpResponse{}, helper.WrapError(err)
+		return input_port.TopUpResponse{}, helper.WrapError(err)
 	}
 
-	return TopUpResponse{
+	return input_port.TopUpResponse{
 		Ok:      true,
 		Message: success,
 	}, nil

@@ -11,7 +11,10 @@ import (
 )
 
 type KMSClient struct {
-	svc *kms.KMS
+	svc          *kms.KMS
+	macAlgorithm *string
+	algorithm    *string
+	keyID        *string
 }
 
 func NewKMSClient(id, secret string) (*KMSClient, error) {
@@ -26,14 +29,17 @@ func NewKMSClient(id, secret string) (*KMSClient, error) {
 	}
 
 	return &KMSClient{
-		svc: kms.New(s),
+		svc:          kms.New(s),
+		macAlgorithm: aws.String("HMAC_SHA_512"),
+		algorithm:    aws.String("RSASSA_PKCS1_V1_5_SHA_512"),
+		keyID:        aws.String("c4fed70d-6cc4-4a8a-a0d5-84eb865e1490"),
 	}, nil
 }
 
 func (instance *KMSClient) GenerateMac(message string) (string, error) {
 	input := &kms.GenerateMacInput{
-		KeyId:        aws.String("c4fed70d-6cc4-4a8a-a0d5-84eb865e1490"),
-		MacAlgorithm: aws.String("HMAC_SHA_512"),
+		KeyId:        instance.keyID,
+		MacAlgorithm: instance.macAlgorithm,
 		Message:      []byte(message),
 	}
 
@@ -47,8 +53,8 @@ func (instance *KMSClient) GenerateMac(message string) (string, error) {
 
 func (instance *KMSClient) VerifyMac(signature, message string) error {
 	input := &kms.VerifyMacInput{
-		KeyId:        aws.String("c4fed70d-6cc4-4a8a-a0d5-84eb865e1490"),
-		MacAlgorithm: aws.String("HMAC_SHA_512"),
+		KeyId:        instance.keyID,
+		MacAlgorithm: instance.macAlgorithm,
 		Mac:          []byte(signature),
 		Message:      []byte(message),
 	}
@@ -63,8 +69,8 @@ func (instance *KMSClient) VerifyMac(signature, message string) error {
 
 func (instance *KMSClient) Sign(message string) (string, error) {
 	input := &kms.SignInput{
-		KeyId:            aws.String("c720978c-a2ab-42c8-baa0-478b5462b49e"),
-		SigningAlgorithm: aws.String("RSASSA_PKCS1_V1_5_SHA_512"),
+		KeyId:            instance.keyID,
+		SigningAlgorithm: instance.algorithm,
 		Message:          []byte(message),
 		MessageType:      aws.String("RAW"),
 	}
@@ -79,8 +85,8 @@ func (instance *KMSClient) Sign(message string) (string, error) {
 
 func (instance *KMSClient) Verify(signature, message string) error {
 	input := &kms.VerifyInput{
-		KeyId:            aws.String("c720978c-a2ab-42c8-baa0-478b5462b49e"),
-		SigningAlgorithm: aws.String("RSASSA_PKCS1_V1_5_SHA_512"),
+		KeyId:            instance.keyID,
+		SigningAlgorithm: instance.algorithm,
 		Signature:        []byte(signature),
 		Message:          []byte(message),
 		MessageType:      aws.String("RAW"),

@@ -2,14 +2,18 @@ package api
 
 import (
 	"encoding/json"
+	"io/ioutil"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hdlproject/es-user-service/helper"
-	"github.com/hdlproject/es-user-service/use_case/interactor"
-	"io/ioutil"
+	"github.com/hdlproject/es-user-service/use_case/input_port"
 )
 
 type (
-	registerRequest struct{}
+	registerRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
 )
 
 func (registerRequest) parse(ctx *gin.Context) (request registerRequest, err error) {
@@ -26,6 +30,9 @@ func (registerRequest) parse(ctx *gin.Context) (request registerRequest, err err
 	return request, nil
 }
 
-func (instance registerRequest) getUseCase() interactor.RegisterRequest {
-	return interactor.RegisterRequest{}
+func (instance registerRequest) getUseCase() input_port.RegisterRequest {
+	return input_port.RegisterRequest{
+		Username: instance.Username,
+		Password: instance.Password,
+	}
 }

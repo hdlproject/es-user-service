@@ -1,12 +1,13 @@
 package api
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hdlproject/es-user-service/config"
 	"github.com/hdlproject/es-user-service/interface_adapter/database"
 	"github.com/hdlproject/es-user-service/use_case/interactor"
-	"log"
-	"net/http"
 )
 
 type (
@@ -22,17 +23,19 @@ func RegisterUserAPI() {
 
 	postgresClient, _ := database.GetPostgresClient(configInstance.Database)
 
+	redisClient := database.GetRedisClient(configInstance.Redis)
+
 	userRouter := httpServer.apiRouter.Group("/user")
 	userRouter.POST("/register", NewUserController(
 		interactor.NewRegisterUseCase(
-			database.NewUserRepo(postgresClient),
+			database.NewUserRepo(postgresClient, redisClient),
 		),
 	).Register)
 }
 
 func NewUserController(registerUseCase *interactor.Register) *UserController {
 	return &UserController{
-		userService: NewUserService(
+		userService: newUserService(
 			registerUseCase,
 		),
 	}

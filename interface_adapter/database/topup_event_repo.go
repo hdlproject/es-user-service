@@ -28,13 +28,13 @@ type (
 func NewTransactionEventRepo(mongoClient *MongoClient) output_port.TopUpEventRepo {
 	return &topUpEventRepo{
 		mongoClient:          mongoClient,
-		topUpEventCollection: mongoClient.DB.Collection("topup_events"),
+		topUpEventCollection: mongoClient.db.Collection("topup_events"),
 	}
 }
 
 func (instance *topUpEventRepo) Insert(event entity.TopUpEvent) (string, error) {
 	data, _ := topUpEvent{}.getData(event)
-	result, err := instance.topUpEventCollection.InsertOne(mongoClient.Context, data)
+	result, err := instance.topUpEventCollection.InsertOne(mongoClient.context, data)
 	if err != nil {
 		return "", helper.WrapError(err)
 	}
@@ -45,7 +45,7 @@ func (instance *topUpEventRepo) Insert(event entity.TopUpEvent) (string, error) 
 func (instance *topUpEventRepo) IsAlreadyApplied(event entity.TopUpEvent) (bool, error) {
 	filter, _ := topUpEvent{}.getData(event)
 	var data topUpEvent
-	err := instance.topUpEventCollection.FindOne(mongoClient.Context, bson.M{"transaction_event_id": filter.TransactionEventID}).Decode(&data)
+	err := instance.topUpEventCollection.FindOne(mongoClient.context, bson.M{"transaction_event_id": filter.TransactionEventID}).Decode(&data)
 	if err != nil {
 		return false, helper.WrapError(err)
 	}

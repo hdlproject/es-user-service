@@ -11,7 +11,7 @@ type (
 	}
 )
 
-func NewUserService(registerUseCase *interactor.Register) *userService {
+func newUserService(registerUseCase *interactor.Register) *userService {
 	return &userService{
 		registerUseCase: registerUseCase,
 	}

@@ -24,8 +24,8 @@ type (
 
 type (
 	userRepo struct {
-		client      *PostgresClient
-		redisClient *RedisClient
+		postgresClient *PostgresClient
+		redisClient    *RedisClient
 	}
 )
 
@@ -33,14 +33,15 @@ var userLocationRedisKey = "user:location"
 
 func NewUserRepo(client *PostgresClient, redisClient *RedisClient) output_port.UserRepo {
 	return &userRepo{
-		client:      client,
-		redisClient: redisClient,
+		postgresClient: client,
+		redisClient:    redisClient,
 	}
 }
 
 func (instance *userRepo) Register(userData entity.User) (uint, error) {
+	// TODO: insert user auth
 	user := User{}.fromEntity(userData)
-	err := instance.client.db.Create(&user).Error
+	err := instance.postgresClient.db.Create(&user).Error
 	if err != nil {
 		return 0, helper.WrapError(err)
 	}
@@ -50,7 +51,9 @@ func (instance *userRepo) Register(userData entity.User) (uint, error) {
 
 func (instance *userRepo) IncreaseBalance(id uint, increment uint64) error {
 	user := User{ID: id}
-	err := instance.client.db.Transaction(func(tx *gorm.DB) error {
+	err := instance.postgresClient.db.Transaction(func(tx *gorm.DB) error {
+		// TODO: change the query to directly update the balance instead of getting the data first
+		// this is needed to prevent a race condition
 		err := tx.First(&user).Error
 		if err != nil {
 			return helper.WrapError(err)

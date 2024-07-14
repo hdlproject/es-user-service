@@ -50,8 +50,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
-	_ = database.GetRedisClient(configInstance.Redis)
 }
 
 func main() {

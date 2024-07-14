@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+
 	"github.com/hdlproject/es-user-service/config"
 	"github.com/hdlproject/es-user-service/helper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,9 +13,9 @@ import (
 
 type (
 	MongoClient struct {
-		Client  *mongo.Client
-		Context context.Context
-		DB      *mongo.Database
+		client  *mongo.Client
+		context context.Context
+		db      *mongo.Database
 	}
 )
 
@@ -64,8 +65,8 @@ func newMongoClient(host, port, username, password, dbName string) (*MongoClient
 	}
 
 	return &MongoClient{
-		Client:  client,
-		Context: ctx,
-		DB:      client.Database(dbName),
+		client:  client,
+		context: ctx,
+		db:      client.Database(dbName),
 	}, nil
 }
